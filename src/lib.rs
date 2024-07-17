@@ -9,83 +9,69 @@ export!(AmplitudeComponent);
 
 struct AmplitudeComponent;
 
-impl Guest for AmplitudeComponent {
-    fn page(p: Payload, cred_map: Dict) -> Result<EdgeeRequest, String> {
+impl AmplitudeComponent {
+    fn build_headers(p: &Payload) -> Vec<(String, String)> {
         let mut headers = HashMap::new();
         headers.insert("content-type", String::from("application/json"));
         headers.insert("user-agent", p.client.user_agent.clone());
         headers.insert("x-forwarded-for", p.client.ip.clone());
+        headers
+            .iter()
+            .map(|(key, value)| (key.to_string(), value.to_string()))
+            .collect()
+    }
+}
 
+impl Guest for AmplitudeComponent {
+    fn page(p: Payload, cred_map: Dict) -> Result<EdgeeRequest, String> {
         let cred: HashMap<String, String> = cred_map
             .iter()
             .map(|(key, value)| (key.to_string(), value.to_string()))
             .collect();
 
-        let amplitude_request = AmplitudeRequest::new(p, cred).map_err(|e| e.to_string())?;
+        let events = AmplitudeRequest::page_events(&p).map_err(|e| e.to_string())?;
+        let amplitude_request = AmplitudeRequest::new(cred, events).map_err(|e| e.to_string())?;
 
-        let edgee_request = EdgeeRequest {
+        Ok(EdgeeRequest {
             method: exports::provider::HttpMethod::Post,
             url: String::from("https://api2.amplitude.com/2/httpapi"),
-            headers: headers
-                .iter()
-                .map(|(key, value)| (key.to_string(), value.to_string()))
-                .collect(),
+            headers: AmplitudeComponent::build_headers(&p),
             body: serde_json::to_string(&amplitude_request).map_err(|e| e.to_string())?,
-        };
-
-        return Ok(edgee_request);
+        })
     }
 
     fn track(p: Payload, cred_map: Dict) -> Result<EdgeeRequest, String> {
-        let mut headers = HashMap::new();
-        headers.insert("content-type", String::from("application/json"));
-        headers.insert("user-agent", p.client.user_agent.clone());
-        headers.insert("x-forwarded-for", p.client.ip.clone());
-
         let cred: HashMap<String, String> = cred_map
             .iter()
             .map(|(key, value)| (key.to_string(), value.to_string()))
             .collect();
 
-        let amplitude_request = AmplitudeRequest::new(p, cred).map_err(|e| e.to_string())?;
+        let events = AmplitudeRequest::track_events(&p).map_err(|e| e.to_string())?;
+        let amplitude_request = AmplitudeRequest::new(cred, events).map_err(|e| e.to_string())?;
 
-        let edgee_request = EdgeeRequest {
+        Ok(EdgeeRequest {
             method: exports::provider::HttpMethod::Post,
             url: String::from("https://api2.amplitude.com/2/httpapi"),
-            headers: headers
-                .iter()
-                .map(|(key, value)| (key.to_string(), value.to_string()))
-                .collect(),
+            headers: AmplitudeComponent::build_headers(&p),
             body: serde_json::to_string(&amplitude_request).map_err(|e| e.to_string())?,
-        };
-
-        return Ok(edgee_request);
+        })
     }
 
     fn identify(p: Payload, cred_map: Dict) -> Result<EdgeeRequest, String> {
-        let mut headers = HashMap::new();
-        headers.insert("content-type", String::from("application/json"));
-        headers.insert("user-agent", p.client.user_agent.clone());
-        headers.insert("x-forwarded-for", p.client.ip.clone());
-
         let cred: HashMap<String, String> = cred_map
             .iter()
             .map(|(key, value)| (key.to_string(), value.to_string()))
             .collect();
 
-        let amplitude_request = AmplitudeRequest::new(p, cred).map_err(|e| e.to_string())?;
+        let events = AmplitudeRequest::identify_events(&p).map_err(|e| e.to_string())?;
+        let amplitude_request = AmplitudeRequest::new(cred, events).map_err(|e| e.to_string())?;
 
-        let edgee_request = EdgeeRequest {
+        Ok(EdgeeRequest {
             method: exports::provider::HttpMethod::Post,
             url: String::from("https://api2.amplitude.com/2/httpapi"),
-            headers: headers
-                .iter()
-                .map(|(key, value)| (key.to_string(), value.to_string()))
-                .collect(),
+            headers: AmplitudeComponent::build_headers(&p),
             body: serde_json::to_string(&amplitude_request).map_err(|e| e.to_string())?,
-        };
-
-        return Ok(edgee_request);
+        })
     }
 }
 
@@ -97,7 +83,7 @@ struct AmplitudeRequest {
 }
 
 impl AmplitudeRequest {
-    fn new(payload: Payload, cred: HashMap<String, String>) -> anyhow::Result<Self> {
+    fn new(cred: HashMap<String, String>, events: Vec<AmplitudeEvent>) -> anyhow::Result<Self> {
         let api_key = match cred.get("amplitude_api_key") {
             Some(key) => key,
             None => return Err(anyhow!("Missing Amplitude API KEY")),
@@ -106,13 +92,6 @@ impl AmplitudeRequest {
 
         let options = AmplitudeOptions { min_id_length: 1 };
 
-        let events = match payload.event_type {
-            exports::provider::EventType::Page => AmplitudeRequest::page_events(payload)?,
-            // exports::provider::EventType::Track => AmplitudeRequest::track_events(payload)?,
-            // exports::provider::EventType::Identify => AmplitudeEvent::identify_events(payload)?,
-            _ => todo!(),
-        };
-
         Ok(Self {
             api_key,
             options,
@@ -120,7 +99,7 @@ impl AmplitudeRequest {
         })
     }
 
-    fn page_events(edgee: Payload) -> anyhow::Result<Vec<AmplitudeEvent>> {
+    fn page_events(edgee: &Payload) -> anyhow::Result<Vec<AmplitudeEvent>> {
         let mut events = vec![];
 
         if let Some(evt) = AmplitudeEvent::session_end(edgee.clone()) {
@@ -228,6 +207,32 @@ impl AmplitudeRequest {
         events.push(evt);
 
         return Ok(events);
+    }
+
+    fn track_events(edgee: &Payload) -> anyhow::Result<Vec<AmplitudeEvent>> {
+        let mut event = AmplitudeEvent::new(&edgee.track.name, edgee.clone());
+        event.time = edgee.timestamp;
+
+        for (key, value) in edgee.track.properties.iter() {
+            event
+                .event_properties
+                .insert(key.clone(), serde_json::to_value(value).unwrap_or_default());
+        }
+
+        return Ok(vec![event]);
+    }
+
+    fn identify_events(edgee: &Payload) -> anyhow::Result<Vec<AmplitudeEvent>> {
+        let mut event = AmplitudeEvent::new("identify", edgee.clone());
+        event.time = edgee.timestamp;
+
+        for (key, value) in edgee.identify.properties.iter() {
+            event
+                .event_properties
+                .insert(key.clone(), serde_json::to_value(value).unwrap_or_default());
+        }
+
+        return Ok(vec![event]);
     }
 }
 
