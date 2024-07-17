@@ -1,2 +1,4 @@
-node_modules
 amplitude.wasm
+/target
+
+wasi_snapshot_preview1.reactor.wasm
