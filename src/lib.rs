@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, vec};
 
 use anyhow::anyhow;
 use exports::provider::{Dict, EdgeeRequest, Guest, Payload};
@@ -11,14 +11,17 @@ struct AmplitudeComponent;
 
 impl AmplitudeComponent {
     fn build_headers(p: &Payload) -> Vec<(String, String)> {
-        let mut headers = HashMap::new();
-        headers.insert("content-type", String::from("application/json"));
-        headers.insert("user-agent", p.client.user_agent.clone());
-        headers.insert("x-forwarded-for", p.client.ip.clone());
-        headers
-            .iter()
-            .map(|(key, value)| (key.to_string(), value.to_string()))
-            .collect()
+        let mut headers = vec![];
+        headers.push((
+            String::from("content-type"),
+            String::from("application/json"),
+        ));
+        headers.push((
+            String::from("user-agent"),
+            String::from(&p.client.user_agent),
+        ));
+        headers.push((String::from("x-forwarded-for"), String::from(&p.client.ip)));
+        return headers;
     }
 }
 
