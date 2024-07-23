@@ -1,0 +1,34 @@
+name: Build and Release WASM
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up build environment
+      run: make ci.setup
+
+    - name: Build WASM
+      run: make ci.build
+    
+    - name: Upload WASM artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: wasm-artifact
+        path: amplitude.wasm 
+        
+    - name: Upload WASM to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./amplitude.wasm 
+        asset_name: amplitude.wasm 
+        asset_content_type: application/wasm
