@@ -16,11 +16,6 @@ jobs:
       run: make ci.setup
     - name: Build WASM
       run: make ci.build
-    - name: Upload WASM artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: wasm-artifact
-        path: amplitude.wasm 
     - name: Upload WASM to release
       uses: actions/upload-release-asset@v1
       env:
