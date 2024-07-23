@@ -22,11 +22,12 @@ dev.build: ## Build the wasi component
 
 ci.setup: ## Install dependencies
 	test -s wasi_snapshot_preview1.reactor.wasm || \
-	curl -LO https://github.com/bytecodealliance/wasmtime/releases/download/v23.0.1/wasi_snapshot_preview1.reactor.wasm
+		nix develop --command \
+			curl -LO https://github.com/bytecodealliance/wasmtime/releases/download/v23.0.1/wasi_snapshot_preview1.reactor.wasm
 
 ci.build: ## Build the wasi component
-	cargo build --release --target wasm32-wasip1
-	wasm-tools component \
+	nix develop --command cargo build --release --target wasm32-wasip1
+	nix develop --command wasm-tools component \
 		new ./target/wasm32-wasip1/release/amplitude_component.wasm \
 		-o amplitude.wasm \
 		--adapt wasi_snapshot_preview1.reactor.wasm

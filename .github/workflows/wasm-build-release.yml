@@ -10,19 +10,17 @@ jobs:
     
     steps:
     - uses: actions/checkout@v3
-    
+    - uses: DeterminateSystems/nix-installer-action@main
+    - uses: DeterminateSystems/magic-nix-cache-action@main 
     - name: Set up build environment
       run: make ci.setup
-
     - name: Build WASM
       run: make ci.build
-    
     - name: Upload WASM artifact
       uses: actions/upload-artifact@v3
       with:
         name: wasm-artifact
         path: amplitude.wasm 
-        
     - name: Upload WASM to release
       uses: actions/upload-release-asset@v1
       env:
