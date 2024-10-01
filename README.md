@@ -32,12 +32,12 @@ This component implements the data collection protocol between [Amplitude](https
 - Download the latest version in our [releases page](../../releases). 
 - Place the wasm file in a known place in your server (e.g. `/var/edgee/components`).
 - Update your edgee proxy config:
-  ```toml
-  [[destinations.data_collection]]
-  name = "amplitude"
-  component = "/var/edgee/components/amplitude.wasm"
-  credentials.amplitude_api_key = "..." 
-  ```
+```toml
+[[destinations.data_collection]]
+name = "amplitude"
+component = "/var/edgee/components/amplitude.wasm"
+credentials.amplitude_api_key = "..." 
+```
 
 ## Contact
 - [Twitter](https://x.com/edgee_cloud)
@@ -46,19 +46,6 @@ This component implements the data collection protocol between [Amplitude](https
 
 ## Contributing
 If you're interested in contributing to Edgee, read our [contribution guidelines](./CONTRIBUTING.md)
-
-### Installing Nix
-
-We use Nix to manage our development environment. You can install it using the following command:
-```
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-```
-
-With Nix installed you can run `nix develop` in this folder and get a shell where all dependencies installed.
-
-### Direnv
-
-Alternatively you can install [direnv](https://direnv.net/docs/installation.html) for a better experience and integration with most IDEs.
 
 ## Reporting Security Vulnerabilities
 If you've found a vulnerability or potential vulnerability in our code, please let us know at
