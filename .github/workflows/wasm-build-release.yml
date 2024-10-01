@@ -15,6 +15,8 @@ jobs:
           targets: wasm32-wasip1
       - name: Set up build environment
         run: make install
+      - name: Wasm target
+        run: rustup target add wasm32-wasip1
       - name: Build WASM
         run: make build
       - name: Upload WASM to release
