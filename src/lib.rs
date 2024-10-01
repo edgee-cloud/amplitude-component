@@ -10,7 +10,7 @@ export!(AmplitudeComponent);
 struct AmplitudeComponent;
 
 impl AmplitudeComponent {
-    fn build_headers(_p: &Payload) -> Vec<(String, String)> {
+    fn build_headers() -> Vec<(String, String)> {
         let mut headers = vec![];
         headers.push((
             String::from("content-type"),
@@ -165,7 +165,7 @@ impl Guest for AmplitudeComponent {
         Ok(EdgeeRequest {
             method: exports::provider::HttpMethod::Post,
             url: String::from("https://api2.amplitude.com/2/httpapi"),
-            headers: AmplitudeComponent::build_headers(&edgee_payload),
+            headers: AmplitudeComponent::build_headers(),
             body: serde_json::to_string(&amplitude_request).map_err(|e| e.to_string())?,
         })
     }
@@ -201,7 +201,7 @@ impl Guest for AmplitudeComponent {
         Ok(EdgeeRequest {
             method: exports::provider::HttpMethod::Post,
             url: String::from("https://api2.amplitude.com/2/httpapi"),
-            headers: AmplitudeComponent::build_headers(&edgee_payload),
+            headers: AmplitudeComponent::build_headers(),
             body: serde_json::to_string(&amplitude_request).map_err(|e| e.to_string())?,
         })
     }
@@ -238,7 +238,7 @@ impl Guest for AmplitudeComponent {
         Ok(EdgeeRequest {
             method: exports::provider::HttpMethod::Post,
             url: String::from("https://api2.amplitude.com/2/httpapi"),
-            headers: AmplitudeComponent::build_headers(&edgee_payload),
+            headers: AmplitudeComponent::build_headers(),
             body: serde_json::to_string(&amplitude_request).map_err(|e| e.to_string())?,
         })
     }
