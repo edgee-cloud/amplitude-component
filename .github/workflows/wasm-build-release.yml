@@ -17,6 +17,8 @@ jobs:
         run: make install
       - name: Wasm target
         run: rustup target add wasm32-wasip1
+      - name: Install wasm-tools
+        run: cargo install --locked wasm-tools
       - name: Build WASM
         run: make build
       - name: Upload WASM to release
