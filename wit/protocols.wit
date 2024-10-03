@@ -9,6 +9,8 @@ world data-collection {
         record payload {
             uuid: string,
             timestamp: s64,
+            timestamp-millis: s64,
+            timestamp-micros: s64,
             event-type: event-type,
             page: page-event,
             identify: identify-event,

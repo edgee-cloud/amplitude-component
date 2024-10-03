@@ -39,11 +39,6 @@ component = "/var/edgee/components/amplitude.wasm"
 credentials.amplitude_api_key = "..." 
 ```
 
-## Contact
-- [Twitter](https://x.com/edgee_cloud)
-- [Slack](https://www.edgee.cloud/slack)
-
-
 ## Contributing
 If you're interested in contributing to Edgee, read our [contribution guidelines](./CONTRIBUTING.md)
 
