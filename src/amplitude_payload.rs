@@ -1,7 +1,7 @@
-use std::collections::HashMap;
+use crate::exports::provider::{Dict, Payload};
 use anyhow::anyhow;
 use serde::Serialize;
-use crate::exports::provider::{Dict, Payload};
+use std::collections::HashMap;
 
 #[derive(Serialize, Debug, Default)]
 pub(crate) struct AmplitudePayload {
@@ -20,11 +20,14 @@ impl AmplitudePayload {
         let api_key = match cred.get("amplitude_api_key") {
             Some(key) => key,
             None => return Err(anyhow!("Missing Amplitude API KEY")),
-        }.to_string();
+        }
+        .to_string();
 
         Ok(Self {
             api_key,
-            options: AmplitudeOptions { min_id_length: Option::from(1) },
+            options: AmplitudeOptions {
+                min_id_length: Option::from(1),
+            },
             events: vec![],
         })
     }
@@ -46,7 +49,10 @@ pub(crate) struct AmplitudeEvent {
     groups: Option<HashMap<String, String>>,
     #[serde(rename = "group_properties", skip_serializing_if = "Option::is_none")]
     group_properties: Option<HashMap<String, serde_json::Value>>,
-    #[serde(rename = "$skip_user_properties_sync", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "$skip_user_properties_sync",
+        skip_serializing_if = "Option::is_none"
+    )]
     skip_user_properties_sync: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     app_version: Option<String>,
@@ -113,7 +119,11 @@ pub(crate) struct AmplitudeEvent {
 }
 
 impl AmplitudeEvent {
-    pub(crate) fn new(event_type: &str, edgee_payload: &Payload, session_id: u64) -> anyhow::Result<Self> {
+    pub(crate) fn new(
+        event_type: &str,
+        edgee_payload: &Payload,
+        session_id: u64,
+    ) -> anyhow::Result<Self> {
         use serde_json::Value as v;
 
         let mut event = Self::default();
@@ -249,7 +259,6 @@ impl AmplitudeEvent {
         if !edgee_payload.client.user_agent_model.is_empty() {
             event.device_model = Option::from(edgee_payload.client.user_agent_model.clone());
         }
-
 
         if !edgee_payload.client.city.is_empty() {
             event.city = Option::from(edgee_payload.client.city.clone());

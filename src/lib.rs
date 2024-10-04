@@ -1,9 +1,9 @@
 mod amplitude_payload;
 
-use std::vec;
-use amplitude_payload::AmplitudePayload;
 use amplitude_payload::AmplitudeEvent;
+use amplitude_payload::AmplitudePayload;
 use exports::provider::{Dict, EdgeeRequest, Guest, Payload};
+use std::vec;
 
 wit_bindgen::generate!({world: "data-collection"});
 export!(AmplitudeComponent);
@@ -20,7 +20,10 @@ impl Guest for AmplitudeComponent {
         let session_id = edgee_payload.session.session_id.parse::<u64>().unwrap() * 1000;
 
         // session_end event
-        if edgee_payload.session.session_start && !edgee_payload.session.previous_session_id.is_empty() && edgee_payload.session.session_id != edgee_payload.session.previous_session_id {
+        if edgee_payload.session.session_start
+            && !edgee_payload.session.previous_session_id.is_empty()
+            && edgee_payload.session.session_id != edgee_payload.session.previous_session_id
+        {
             let previous_session_id_int = edgee_payload
                 .session
                 .previous_session_id
@@ -28,7 +31,9 @@ impl Guest for AmplitudeComponent {
                 .parse::<u64>()
                 .unwrap();
             let previous_session_id = previous_session_id_int * 1000;
-            let mut session_end_event = AmplitudeEvent::new("session_end", &edgee_payload, previous_session_id).map_err(|e| e.to_string())?;
+            let mut session_end_event =
+                AmplitudeEvent::new("session_end", &edgee_payload, previous_session_id)
+                    .map_err(|e| e.to_string())?;
             session_end_event.time = edgee_payload.timestamp - 2;
 
             amplitude_payload.events.push(session_end_event);
@@ -36,14 +41,17 @@ impl Guest for AmplitudeComponent {
 
         // session_start event
         if edgee_payload.session.session_start {
-            let mut session_start_event = AmplitudeEvent::new("session_start", &edgee_payload, session_id).map_err(|e| e.to_string())?;
+            let mut session_start_event =
+                AmplitudeEvent::new("session_start", &edgee_payload, session_id)
+                    .map_err(|e| e.to_string())?;
             session_start_event.time = edgee_payload.timestamp - 1;
 
             amplitude_payload.events.push(session_start_event);
         }
 
         // page_view event
-        let mut event = AmplitudeEvent::new("[Amplitude] Page Viewed", &edgee_payload, session_id).map_err(|e| e.to_string())?;
+        let mut event = AmplitudeEvent::new("[Amplitude] Page Viewed", &edgee_payload, session_id)
+            .map_err(|e| e.to_string())?;
         event.time = edgee_payload.timestamp;
 
         let mut event_props = serde_json::Map::new();
@@ -159,7 +167,8 @@ impl Guest for AmplitudeComponent {
         let session_id = edgee_payload.session.session_id.parse::<u64>().unwrap() * 1000;
 
         // create a new event and prepare it
-        let mut event = AmplitudeEvent::new(&edgee_payload.track.name, &edgee_payload, session_id).map_err(|e| e.to_string())?;
+        let mut event = AmplitudeEvent::new(&edgee_payload.track.name, &edgee_payload, session_id)
+            .map_err(|e| e.to_string())?;
 
         // set event time
         event.time = edgee_payload.timestamp;
@@ -182,7 +191,9 @@ impl Guest for AmplitudeComponent {
     }
 
     fn identify(edgee_payload: Payload, cred_map: Dict) -> Result<EdgeeRequest, String> {
-        if edgee_payload.identify.user_id.is_empty() || edgee_payload.identify.anonymous_id.is_empty() {
+        if edgee_payload.identify.user_id.is_empty()
+            || edgee_payload.identify.anonymous_id.is_empty()
+        {
             return Err("Missing user id".to_string());
         }
 
@@ -192,7 +203,8 @@ impl Guest for AmplitudeComponent {
         let session_id = edgee_payload.session.session_id.parse::<u64>().unwrap() * 1000;
 
         // create a new event and prepare it
-        let mut event = AmplitudeEvent::new("identify", &edgee_payload, session_id).map_err(|e| e.to_string())?;
+        let mut event = AmplitudeEvent::new("identify", &edgee_payload, session_id)
+            .map_err(|e| e.to_string())?;
 
         // set event time
         event.time = edgee_payload.timestamp;
@@ -229,5 +241,3 @@ fn build_edgee_request(amplitude_payload: AmplitudePayload) -> EdgeeRequest {
         body: serde_json::to_string(&amplitude_payload).unwrap(),
     }
 }
-
-
