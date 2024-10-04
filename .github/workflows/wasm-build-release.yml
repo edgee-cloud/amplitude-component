@@ -1,5 +1,7 @@
 name: Build and Release WASM
 
+permissions:
+  contents: write
 on:
   release:
     types: [ published ]
