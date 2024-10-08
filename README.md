@@ -45,3 +45,21 @@ If you're interested in contributing to Edgee, read our [contribution guidelines
 ## Reporting Security Vulnerabilities
 If you've found a vulnerability or potential vulnerability in our code, please let us know at
 [edgee-security](mailto:security@edgee.cloud).
+
+## Building from source
+
+To build the wasm file from source, you need to have installed 
+- [Rust](https://www.rust-lang.org/tools/install)
+- `wasm32-wasip1` target: run `rustup target add wasm32-wasip1`
+- `wasm-tools`: run `cargo install --locked wasm-tools`
+
+Then you can run the following commands:
+
+```bash
+
+Then you can run the following commands:
+
+```bash
+make install
+make build
+```
