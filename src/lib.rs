@@ -192,9 +192,9 @@ impl Guest for AmplitudeComponent {
 
     fn identify(edgee_payload: Payload, cred_map: Dict) -> Result<EdgeeRequest, String> {
         if edgee_payload.identify.user_id.is_empty()
-            || edgee_payload.identify.anonymous_id.is_empty()
+            && edgee_payload.identify.anonymous_id.is_empty()
         {
-            return Err("Missing user id".to_string());
+            return Err("userId or anonymousId is not set".to_string());
         }
 
         let mut amplitude_payload = AmplitudePayload::new(cred_map).map_err(|e| e.to_string())?;
