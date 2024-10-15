@@ -11,7 +11,7 @@ help:
 
 install: ## Install dependencies
 	test -s wasi_snapshot_preview1.reactor.wasm || \
-	curl -LO https://github.com/bytecodealliance/wasmtime/releases/download/v25.0.1/wasi_snapshot_preview1.reactor.wasm
+	curl -LO https://github.com/bytecodealliance/wasmtime/releases/download/v25.0.2/wasi_snapshot_preview1.reactor.wasm
 
 build: ## Build the wasi component
 	cargo build --target wasm32-wasip1
