@@ -210,7 +210,7 @@ impl Guest for AmplitudeComponent {
 
         if let Data::User(ref data) = edgee_event.data {
             if data.user_id.is_empty() && data.anonymous_id.is_empty() {
-                return Err("userId or anonymousId is not set".to_string());
+                return Err("user_id or anonymous_id is not set".to_string());
             }
 
             let mut amplitude_payload =
