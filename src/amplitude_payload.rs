@@ -1,4 +1,4 @@
-use crate::exports::provider::{Dict, Payload};
+use crate::exports::provider::{Dict, Event};
 use anyhow::anyhow;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -36,14 +36,14 @@ impl AmplitudePayload {
 #[derive(Serialize, Debug, Default)]
 pub(crate) struct AmplitudeEvent {
     #[serde(rename = "user_id", skip_serializing_if = "Option::is_none")]
-    user_id: Option<String>,
+    pub(crate) user_id: Option<String>,
     #[serde(rename = "device_id", skip_serializing_if = "Option::is_none")]
     device_id: Option<String>,
     event_type: String,
     #[serde(rename = "event_properties", skip_serializing_if = "Option::is_none")]
     pub(crate) event_properties: Option<serde_json::Value>,
     #[serde(rename = "user_properties", skip_serializing_if = "Option::is_none")]
-    user_properties: Option<serde_json::Value>,
+    pub(crate) user_properties: Option<serde_json::Value>,
     pub(crate) time: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
     groups: Option<HashMap<String, String>>,
@@ -121,7 +121,7 @@ pub(crate) struct AmplitudeEvent {
 impl AmplitudeEvent {
     pub(crate) fn new(
         event_type: &str,
-        edgee_payload: &Payload,
+        edgee_event: &Event,
         session_id: u64,
     ) -> anyhow::Result<Self> {
         use serde_json::Value as v;
@@ -134,34 +134,34 @@ impl AmplitudeEvent {
         let mut user_props = serde_json::Map::new();
 
         // identify
-        if !edgee_payload.identify.user_id.is_empty() {
-            event.user_id = Option::from(edgee_payload.identify.user_id.clone());
+        if !edgee_event.context.user.user_id.is_empty() {
+            event.user_id = Option::from(edgee_event.context.user.user_id.clone());
         }
-        if !edgee_payload.identify.anonymous_id.is_empty() {
+        if !edgee_event.context.user.anonymous_id.is_empty() {
             user_props.insert(
                 "anonymous_id".to_string(),
-                v::String(edgee_payload.identify.anonymous_id.clone()),
+                v::String(edgee_event.context.user.anonymous_id.clone()),
             );
         }
 
         // set edgee_id as device_id
         // todo continuity of the DeviceID
-        event.device_id = Option::from(edgee_payload.identify.edgee_id.clone());
+        event.device_id = Option::from(edgee_event.context.user.edgee_id.clone());
 
         // set user_props HashMap<String, v>
         let mut set_user_props = serde_json::Map::new();
         let mut set_once_user_props = serde_json::Map::new();
-        if !edgee_payload.page.referrer.is_empty() {
+        if !edgee_event.context.page.referrer.is_empty() {
             set_user_props.insert(
                 "referrer".to_string(),
-                v::String(edgee_payload.page.referrer.clone()),
+                v::String(edgee_event.context.page.referrer.clone()),
             );
             set_once_user_props.insert(
                 "initial_referrer".to_string(),
-                v::String(edgee_payload.page.referrer.clone()),
+                v::String(edgee_event.context.page.referrer.clone()),
             );
 
-            let parsed_referrer = url::Url::parse(&edgee_payload.page.referrer)?;
+            let parsed_referrer = url::Url::parse(&edgee_event.context.page.referrer)?;
             if let Some(referring_domain) = parsed_referrer.domain() {
                 set_user_props.insert(
                     "referring_domain".to_string(),
@@ -175,54 +175,54 @@ impl AmplitudeEvent {
         }
 
         // utm_campaign, utm_source, utm_medium, utm_term, utm_content
-        if !edgee_payload.campaign.name.is_empty() {
+        if !edgee_event.context.campaign.name.is_empty() {
             set_user_props.insert(
                 "utm_campaign".to_string(),
-                v::String(edgee_payload.campaign.name.clone()),
+                v::String(edgee_event.context.campaign.name.clone()),
             );
             set_once_user_props.insert(
                 "initial_utm_campaign".to_string(),
-                v::String(edgee_payload.campaign.name.clone()),
+                v::String(edgee_event.context.campaign.name.clone()),
             );
         }
-        if !edgee_payload.campaign.source.is_empty() {
+        if !edgee_event.context.campaign.source.is_empty() {
             set_user_props.insert(
                 "utm_source".to_string(),
-                v::String(edgee_payload.campaign.source.clone()),
+                v::String(edgee_event.context.campaign.source.clone()),
             );
             set_once_user_props.insert(
                 "initial_utm_source".to_string(),
-                v::String(edgee_payload.campaign.source.clone()),
+                v::String(edgee_event.context.campaign.source.clone()),
             );
         }
-        if !edgee_payload.campaign.medium.is_empty() {
+        if !edgee_event.context.campaign.medium.is_empty() {
             set_user_props.insert(
                 "utm_medium".to_string(),
-                v::String(edgee_payload.campaign.medium.clone()),
+                v::String(edgee_event.context.campaign.medium.clone()),
             );
             set_once_user_props.insert(
                 "initial_utm_medium".to_string(),
-                v::String(edgee_payload.campaign.medium.clone()),
+                v::String(edgee_event.context.campaign.medium.clone()),
             );
         }
-        if !edgee_payload.campaign.term.is_empty() {
+        if !edgee_event.context.campaign.term.is_empty() {
             set_user_props.insert(
                 "utm_term".to_string(),
-                v::String(edgee_payload.campaign.term.clone()),
+                v::String(edgee_event.context.campaign.term.clone()),
             );
             set_once_user_props.insert(
                 "initial_utm_term".to_string(),
-                v::String(edgee_payload.campaign.term.clone()),
+                v::String(edgee_event.context.campaign.term.clone()),
             );
         }
-        if !edgee_payload.campaign.content.is_empty() {
+        if !edgee_event.context.campaign.content.is_empty() {
             set_user_props.insert(
                 "utm_content".to_string(),
-                v::String(edgee_payload.campaign.content.clone()),
+                v::String(edgee_event.context.campaign.content.clone()),
             );
             set_once_user_props.insert(
                 "initial_utm_content".to_string(),
-                v::String(edgee_payload.campaign.content.clone()),
+                v::String(edgee_event.context.campaign.content.clone()),
             );
         }
 
@@ -236,38 +236,38 @@ impl AmplitudeEvent {
         );
 
         // add custom user properties
-        if !edgee_payload.identify.properties.is_empty() {
-            for (key, value) in edgee_payload.identify.properties.clone().iter() {
+        if !edgee_event.context.user.properties.is_empty() {
+            for (key, value) in edgee_event.context.user.properties.clone().iter() {
                 user_props.insert(key.clone(), value.clone().parse().unwrap_or_default());
             }
         }
         event.user_properties = Some(serde_json::to_value(user_props)?);
 
-        event.user_agent = Option::from(edgee_payload.client.user_agent.clone());
-        event.language = Option::from(edgee_payload.client.locale.clone());
-        event.ip = Option::from(edgee_payload.client.ip.clone());
+        event.user_agent = Option::from(edgee_event.context.client.user_agent.clone());
+        event.language = Option::from(edgee_event.context.client.locale.clone());
+        event.ip = Option::from(edgee_event.context.client.ip.clone());
         if session_id != 0 {
             event.session_id = Some(session_id);
         }
 
-        if !edgee_payload.client.os_name.is_empty() {
-            event.os_name = Option::from(edgee_payload.client.os_name.clone());
+        if !edgee_event.context.client.os_name.is_empty() {
+            event.os_name = Option::from(edgee_event.context.client.os_name.clone());
         }
-        if !edgee_payload.client.os_version.is_empty() {
-            event.os_version = Option::from(edgee_payload.client.os_version.clone());
+        if !edgee_event.context.client.os_version.is_empty() {
+            event.os_version = Option::from(edgee_event.context.client.os_version.clone());
         }
-        if !edgee_payload.client.user_agent_model.is_empty() {
-            event.device_model = Option::from(edgee_payload.client.user_agent_model.clone());
+        if !edgee_event.context.client.user_agent_model.is_empty() {
+            event.device_model = Option::from(edgee_event.context.client.user_agent_model.clone());
         }
 
-        if !edgee_payload.client.city.is_empty() {
-            event.city = Option::from(edgee_payload.client.city.clone());
+        if !edgee_event.context.client.city.is_empty() {
+            event.city = Option::from(edgee_event.context.client.city.clone());
         }
-        if !edgee_payload.client.region.is_empty() {
-            event.region = Option::from(edgee_payload.client.region.clone());
+        if !edgee_event.context.client.region.is_empty() {
+            event.region = Option::from(edgee_event.context.client.region.clone());
         }
-        if !edgee_payload.client.country_code.is_empty() {
-            event.country = Option::from(edgee_payload.client.country_code.clone());
+        if !edgee_event.context.client.country_code.is_empty() {
+            event.country = Option::from(edgee_event.context.client.country_code.clone());
         }
 
         // todo missing following fields
