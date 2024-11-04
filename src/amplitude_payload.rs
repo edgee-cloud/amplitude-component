@@ -238,7 +238,7 @@ impl AmplitudeEvent {
         // add custom user properties
         if !edgee_event.context.user.properties.is_empty() {
             for (key, value) in edgee_event.context.user.properties.clone().iter() {
-                user_props.insert(key.clone(), value.clone().parse().unwrap_or_default());
+                user_props.insert(key.clone(), parse_value(value));
             }
         }
         event.user_properties = Some(serde_json::to_value(user_props)?);
@@ -290,6 +290,18 @@ impl AmplitudeEvent {
         // missing event.plan
 
         Ok(event)
+    }
+}
+
+pub fn parse_value(value: &str) -> serde_json::Value {
+    if value == "true" {
+        serde_json::Value::from(true)
+    } else if value == "false" {
+        serde_json::Value::from(false)
+    } else if let Some(_v) = value.parse::<f64>().ok() {
+        serde_json::Value::Number(value.parse().unwrap())
+    } else {
+        serde_json::Value::String(value.to_string())
     }
 }
 

@@ -4,6 +4,7 @@ use amplitude_payload::AmplitudeEvent;
 use amplitude_payload::AmplitudePayload;
 use exports::provider::{Data, Dict, EdgeeRequest, Event, Guest};
 use std::vec;
+use crate::amplitude_payload::parse_value;
 
 wit_bindgen::generate!({world: "data-collection"});
 export!(AmplitudeComponent);
@@ -110,7 +111,7 @@ impl Guest for AmplitudeComponent {
             // add custom page properties
             if !data.properties.is_empty() {
                 for (key, value) in data.properties.clone().iter() {
-                    event_props.insert(key.clone(), value.clone().parse().unwrap_or_default());
+                    event_props.insert(key.clone(), parse_value(value));
                 }
             }
 
@@ -189,7 +190,7 @@ impl Guest for AmplitudeComponent {
             let mut properties = serde_json::Map::new();
             if !data.properties.is_empty() {
                 for (key, value) in data.properties.clone().iter() {
-                    properties.insert(key.clone(), value.clone().parse().unwrap_or_default());
+                    properties.insert(key.clone(), parse_value(value));
                 }
             }
             if properties.len() > 0 {
@@ -249,7 +250,7 @@ impl Guest for AmplitudeComponent {
 
             if !data.properties.is_empty() {
                 for (key, value) in data.properties.clone().iter() {
-                    properties.insert(key.clone(), value.clone().parse().unwrap_or_default());
+                    properties.insert(key.clone(), parse_value(value));
                 }
             }
 
