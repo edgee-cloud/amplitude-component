@@ -1,10 +1,10 @@
 mod amplitude_payload;
 
+use crate::amplitude_payload::parse_value;
 use amplitude_payload::AmplitudeEvent;
 use amplitude_payload::AmplitudePayload;
 use exports::provider::{Data, Dict, EdgeeRequest, Event, Guest};
 use std::vec;
-use crate::amplitude_payload::parse_value;
 
 wit_bindgen::generate!({world: "data-collection"});
 export!(AmplitudeComponent);
