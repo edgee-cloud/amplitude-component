@@ -195,7 +195,7 @@ impl Guest for AmplitudeComponent {
                     properties.insert(key.clone(), parse_value(value));
                 }
             }
-            if properties.len() > 0 {
+            if !properties.is_empty() {
                 event.event_properties = Some(serde_json::to_value(properties).unwrap());
             }
 
@@ -256,7 +256,7 @@ impl Guest for AmplitudeComponent {
                 }
             }
 
-            if properties.len() > 0 {
+            if !properties.is_empty() {
                 event.user_properties = Some(serde_json::to_value(properties).unwrap());
             }
 

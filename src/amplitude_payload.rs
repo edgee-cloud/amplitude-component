@@ -306,7 +306,7 @@ pub fn parse_value(value: &str) -> serde_json::Value {
         serde_json::Value::from(true)
     } else if value == "false" {
         serde_json::Value::from(false)
-    } else if let Some(_v) = value.parse::<f64>().ok() {
+    } else if let Ok(_v) = value.parse::<f64>() {
         serde_json::Value::Number(value.parse().unwrap())
     } else {
         serde_json::Value::String(value.to_string())
