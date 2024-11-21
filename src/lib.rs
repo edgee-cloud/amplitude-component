@@ -9,6 +9,8 @@ use std::vec;
 wit_bindgen::generate!({world: "data-collection"});
 export!(AmplitudeComponent);
 
+const DEFAULT_ENDPOINT: &str = "https://api2.amplitude.com/2/httpapi";
+
 struct AmplitudeComponent;
 
 impl Guest for AmplitudeComponent {
@@ -277,7 +279,7 @@ fn build_edgee_request(amplitude_payload: AmplitudePayload) -> EdgeeRequest {
 
     EdgeeRequest {
         method: exports::provider::HttpMethod::Post,
-        url: String::from("https://api2.amplitude.com/2/httpapi"),
+        url: amplitude_payload.endpoint.clone(),
         headers,
         body: serde_json::to_string(&amplitude_payload).unwrap(),
     }

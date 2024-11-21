@@ -6,6 +6,8 @@ use std::collections::HashMap;
 #[derive(Serialize, Debug, Default)]
 pub(crate) struct AmplitudePayload {
     api_key: String,
+    #[serde(skip)]
+    pub endpoint: String,
     pub(crate) events: Vec<AmplitudeEvent>,
     options: AmplitudeOptions,
 }
@@ -23,8 +25,14 @@ impl AmplitudePayload {
         }
         .to_string();
 
+        let endpoint = cred
+            .get("endpoint")
+            .cloned()
+            .unwrap_or(crate::DEFAULT_ENDPOINT.to_owned());
+
         Ok(Self {
             api_key,
+            endpoint,
             options: AmplitudeOptions {
                 min_id_length: Option::from(1),
             },
