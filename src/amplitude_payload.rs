@@ -6,6 +6,8 @@ use std::collections::HashMap;
 #[derive(Serialize, Debug, Default)]
 pub(crate) struct AmplitudePayload {
     api_key: String,
+    #[serde(skip)]
+    pub endpoint: String,
     pub(crate) events: Vec<AmplitudeEvent>,
     options: AmplitudeOptions,
 }
@@ -23,8 +25,14 @@ impl AmplitudePayload {
         }
         .to_string();
 
+        let endpoint = cred
+            .get("endpoint")
+            .cloned()
+            .unwrap_or(crate::DEFAULT_ENDPOINT.to_owned());
+
         Ok(Self {
             api_key,
+            endpoint,
             options: AmplitudeOptions {
                 min_id_length: Option::from(1),
             },
@@ -298,7 +306,7 @@ pub fn parse_value(value: &str) -> serde_json::Value {
         serde_json::Value::from(true)
     } else if value == "false" {
         serde_json::Value::from(false)
-    } else if let Some(_v) = value.parse::<f64>().ok() {
+    } else if let Ok(_v) = value.parse::<f64>() {
         serde_json::Value::Number(value.parse().unwrap())
     } else {
         serde_json::Value::String(value.to_string())
