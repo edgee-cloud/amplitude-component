@@ -16,7 +16,7 @@ dependencies = [
 
 [[package]]
 name = "amplitude-component"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "anyhow",
  "serde",
