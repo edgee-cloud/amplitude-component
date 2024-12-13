@@ -21,11 +21,20 @@
 
 This component implements the data collection protocol between [Amplitude](https://amplitude.com) and [Edgee](https://www.edgee.cloud).
 
-### Protocol coverage
+#### Event mapping:
 
-| Page | Track | User |
-|------|-------|------|
-| ✅   | ✅    | ✅    |
+Here is the mapping between Edgee events and Amplitude events:
+
+| Edgee event | Amplitude Event  |
+|-------------|-----------|
+| Page   | `[Amplitude] Page Viewed` _(and session_start/session_end if needed)_  |
+| Track  | Name of the event |
+| User   | `identify` |
+
+Each time you make a `user` call, Edgee will send an `identify` event to Amplitude.
+
+But when you make a `user` call using Edgee's JS library or Data Layer, the `user_id`, `anonymous_id` and `properties` are stored in the user's device.
+This allows the user's data to be added to any subsequent page or follow-up calls for the user, so that you can correctly attribute these actions.
 
 ## Usage
 
