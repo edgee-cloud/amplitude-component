@@ -3,10 +3,16 @@ mod amplitude_payload;
 use crate::amplitude_payload::parse_value;
 use amplitude_payload::AmplitudeEvent;
 use amplitude_payload::AmplitudePayload;
-use exports::provider::{Data, Dict, EdgeeRequest, Event, Guest};
+use exports::edgee::protocols::provider::Data;
+use exports::edgee::protocols::provider::Dict;
+use exports::edgee::protocols::provider::EdgeeRequest;
+use exports::edgee::protocols::provider::Event;
+use exports::edgee::protocols::provider::Guest;
+use exports::edgee::protocols::provider::HttpMethod;
 use std::vec;
 
-wit_bindgen::generate!({world: "data-collection"});
+wit_bindgen::generate!({world: "data-collection", path: "wit", with: { "edgee:protocols/provider": generate }});
+
 export!(AmplitudeComponent);
 
 const DEFAULT_ENDPOINT: &str = "https://api2.amplitude.com/2/httpapi";
@@ -278,7 +284,7 @@ fn build_edgee_request(amplitude_payload: AmplitudePayload) -> EdgeeRequest {
     ));
 
     EdgeeRequest {
-        method: exports::provider::HttpMethod::Post,
+        method: HttpMethod::Post,
         url: amplitude_payload.endpoint.clone(),
         headers,
         body: serde_json::to_string(&amplitude_payload).unwrap(),
