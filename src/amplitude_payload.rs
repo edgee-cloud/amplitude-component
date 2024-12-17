@@ -1,7 +1,8 @@
-use crate::exports::provider::{Dict, Event};
 use anyhow::anyhow;
 use serde::Serialize;
 use std::collections::HashMap;
+
+use crate::exports::edgee::protocols::provider::{Dict, Event};
 
 #[derive(Serialize, Debug, Default)]
 pub(crate) struct AmplitudePayload {
