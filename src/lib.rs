@@ -277,11 +277,10 @@ impl Guest for AmplitudeComponent {
 }
 
 fn build_edgee_request(amplitude_payload: AmplitudePayload) -> EdgeeRequest {
-    let mut headers = vec![];
-    headers.push((
+    let headers = vec![(
         String::from("content-type"),
         String::from("application/json"),
-    ));
+    )];
 
     EdgeeRequest {
         method: HttpMethod::Post,
