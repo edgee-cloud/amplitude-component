@@ -135,10 +135,12 @@ impl AmplitudeEvent {
     ) -> anyhow::Result<Self> {
         use serde_json::Value as v;
 
-        let mut event = Self::default();
-        event.event_type = String::from(event_type);
-        event.library = Option::from(String::from("Edgee"));
-        event.platform = Option::from(String::from("Web"));
+        let mut event = Self {
+            event_type: String::from(event_type),
+            library: Some(String::from("Edgee")),
+            platform: Some(String::from("Web")),
+            ..Self::default()
+        };
 
         let mut user_props = serde_json::Map::new();
 
