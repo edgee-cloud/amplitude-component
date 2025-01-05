@@ -155,9 +155,12 @@ impl AmplitudeEvent {
             );
         }
 
-        // set edgee_id as device_id
-        // todo continuity of the DeviceID
-        event.device_id = Option::from(edgee_event.context.user.edgee_id.clone());
+        // device_id with ID continuity if enabled
+        event.device_id = if !edgee_event.context.user.component_id.is_empty() {
+            Option::from(edgee_event.context.user.component_id.clone())
+        } else {
+            Option::from(edgee_event.context.user.edgee_id.clone())
+        };
 
         // set user_props HashMap<String, v>
         let mut set_user_props = serde_json::Map::new();
