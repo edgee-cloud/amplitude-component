@@ -156,7 +156,6 @@ impl AmplitudeEvent {
         }
 
         // set edgee_id as device_id
-        // todo continuity of the DeviceID
         event.device_id = Option::from(edgee_event.context.user.edgee_id.clone());
 
         // set user_props HashMap<String, v>
