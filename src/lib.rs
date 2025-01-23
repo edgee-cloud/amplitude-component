@@ -3,15 +3,15 @@ mod amplitude_payload;
 use crate::amplitude_payload::parse_value;
 use amplitude_payload::AmplitudeEvent;
 use amplitude_payload::AmplitudePayload;
-use exports::edgee::protocols::provider::Data;
-use exports::edgee::protocols::provider::Dict;
-use exports::edgee::protocols::provider::EdgeeRequest;
-use exports::edgee::protocols::provider::Event;
-use exports::edgee::protocols::provider::Guest;
-use exports::edgee::protocols::provider::HttpMethod;
+use exports::edgee::protocols::data_collection::Data;
+use exports::edgee::protocols::data_collection::Dict;
+use exports::edgee::protocols::data_collection::EdgeeRequest;
+use exports::edgee::protocols::data_collection::Event;
+use exports::edgee::protocols::data_collection::Guest;
+use exports::edgee::protocols::data_collection::HttpMethod;
 use std::vec;
 
-wit_bindgen::generate!({world: "data-collection", path: "wit", with: { "edgee:protocols/provider": generate }});
+wit_bindgen::generate!({world: "edgee", path: "wit", with: { "edgee:protocols/data-collection": generate }});
 
 export!(AmplitudeComponent);
 
@@ -293,29 +293,29 @@ fn build_edgee_request(amplitude_payload: AmplitudePayload) -> EdgeeRequest {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::exports::edgee::protocols::provider::{
+    use crate::exports::edgee::protocols::data_collection::{
         Campaign, Client, Context, EventType, PageData, Session, TrackData, UserData,
     };
-    use exports::edgee::protocols::provider::Consent;
+    use exports::edgee::protocols::data_collection::Consent;
     use pretty_assertions::assert_eq;
     use uuid::Uuid;
 
     fn sample_user_data(edgee_id: String) -> UserData {
-        return UserData {
+        UserData {
             user_id: "123".to_string(),
             anonymous_id: "456".to_string(),
-            edgee_id: edgee_id,
+            edgee_id,
             properties: vec![
                 ("prop1".to_string(), "true".to_string()),
                 ("prop2".to_string(), "false".to_string()),
                 ("prop3".to_string(), "10".to_string()),
                 ("prop4".to_string(), "ok".to_string()),
             ],
-        };
+        }
     }
 
     fn sample_user_data_invalid_without_ids() -> UserData {
-        return UserData {
+        UserData {
             user_id: "".to_string(),      // empty
             anonymous_id: "".to_string(), // empty
             edgee_id: "abc".to_string(),
@@ -323,17 +323,17 @@ mod tests {
                 ("prop1".to_string(), "value1".to_string()),
                 ("prop2".to_string(), "10".to_string()),
             ],
-        };
+        }
     }
 
     fn sample_context(edgee_id: String, locale: String, session_start: bool) -> Context {
-        return Context {
+        Context {
             page: sample_page_data(),
             user: sample_user_data(edgee_id),
             client: Client {
                 city: "Paris".to_string(),
                 ip: "192.168.0.1".to_string(),
-                locale: locale,
+                locale,
                 timezone: "CET".to_string(),
                 user_agent: "Chrome".to_string(),
                 user_agent_architecture: "fuck knows".to_string(),
@@ -365,15 +365,15 @@ mod tests {
                 session_id: "123".to_string(),
                 previous_session_id: "345".to_string(),
                 session_count: 2,
-                session_start: session_start,
+                session_start,
                 first_seen: 123,
                 last_seen: 123,
             },
-        };
+        }
     }
 
     fn sample_page_data() -> PageData {
-        return PageData {
+        PageData {
             name: "page name".to_string(),
             category: "category".to_string(),
             keywords: vec!["value1".to_string(), "value2".into()],
@@ -387,7 +387,7 @@ mod tests {
                 ("prop2".to_string(), "10".to_string()),
                 ("currency".to_string(), "USD".to_string()),
             ],
-        };
+        }
     }
 
     fn sample_page_event(
@@ -396,7 +396,7 @@ mod tests {
         locale: String,
         session_start: bool,
     ) -> Event {
-        return Event {
+        Event {
             uuid: Uuid::new_v4().to_string(),
             timestamp: 123,
             timestamp_millis: 123,
@@ -404,12 +404,12 @@ mod tests {
             event_type: EventType::Page,
             data: Data::Page(sample_page_data()),
             context: sample_context(edgee_id, locale, session_start),
-            consent: consent,
-        };
+            consent,
+        }
     }
 
     fn sample_track_data(event_name: String) -> TrackData {
-        return TrackData {
+        TrackData {
             name: event_name,
             products: vec![],
             properties: vec![
@@ -417,7 +417,7 @@ mod tests {
                 ("prop2".to_string(), "10".to_string()),
                 ("currency".to_string(), "USD".to_string()),
             ],
-        };
+        }
     }
 
     fn sample_track_event(
@@ -427,7 +427,7 @@ mod tests {
         locale: String,
         session_start: bool,
     ) -> Event {
-        return Event {
+        Event {
             uuid: Uuid::new_v4().to_string(),
             timestamp: 123,
             timestamp_millis: 123,
@@ -435,8 +435,8 @@ mod tests {
             event_type: EventType::Track,
             data: Data::Track(sample_track_data(event_name)),
             context: sample_context(edgee_id, locale, session_start),
-            consent: consent,
-        };
+            consent,
+        }
     }
 
     fn sample_user_event(
@@ -445,7 +445,7 @@ mod tests {
         locale: String,
         session_start: bool,
     ) -> Event {
-        return Event {
+        Event {
             uuid: Uuid::new_v4().to_string(),
             timestamp: 123,
             timestamp_millis: 123,
@@ -453,8 +453,8 @@ mod tests {
             event_type: EventType::User,
             data: Data::User(sample_user_data(edgee_id.clone())),
             context: sample_context(edgee_id, locale, session_start),
-            consent: consent,
-        };
+            consent,
+        }
     }
 
     fn sample_user_event_without_ids(
@@ -464,7 +464,7 @@ mod tests {
         session_start: bool,
     ) -> Event {
         let user_data = sample_user_data_invalid_without_ids();
-        return Event {
+        Event {
             uuid: Uuid::new_v4().to_string(),
             timestamp: 123,
             timestamp_millis: 123,
@@ -472,12 +472,12 @@ mod tests {
             event_type: EventType::User,
             data: Data::User(user_data.clone()),
             context: sample_context(edgee_id, locale, session_start),
-            consent: consent,
-        };
+            consent,
+        }
     }
 
     fn sample_credentials() -> Vec<(String, String)> {
-        return vec![("amplitude_api_key".to_string(), "abc".to_string())];
+        vec![("amplitude_api_key".to_string(), "abc".to_string())]
     }
 
     #[test]
@@ -494,7 +494,7 @@ mod tests {
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
         assert_eq!(edgee_request.method, HttpMethod::Post);
-        assert_eq!(edgee_request.body.len() > 0, true);
+        assert!(!edgee_request.body.is_empty());
         assert_eq!(
             edgee_request
                 .url
@@ -513,7 +513,7 @@ mod tests {
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
         assert_eq!(edgee_request.method, HttpMethod::Post);
-        assert_eq!(edgee_request.body.len() > 0, true);
+        assert!(!edgee_request.body.is_empty());
     }
 
     #[test]
@@ -525,7 +525,7 @@ mod tests {
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
         assert_eq!(edgee_request.method, HttpMethod::Post);
-        assert_eq!(edgee_request.body.len() > 0, true);
+        assert!(!edgee_request.body.is_empty());
     }
 
     #[test]
@@ -538,7 +538,7 @@ mod tests {
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
         assert_eq!(edgee_request.method, HttpMethod::Post);
-        assert_eq!(edgee_request.body.len() > 0, true);
+        assert!(!edgee_request.body.is_empty());
     }
 
     #[test]
@@ -550,7 +550,7 @@ mod tests {
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
         assert_eq!(edgee_request.method, HttpMethod::Post);
-        assert_eq!(edgee_request.body.len() > 0, true);
+        assert!(!edgee_request.body.is_empty());
     }
 
     #[test]
@@ -575,7 +575,7 @@ mod tests {
         assert_eq!(result.clone().is_err(), false);
         let edgee_request = result.unwrap();
         assert_eq!(edgee_request.method, HttpMethod::Post);
-        assert_eq!(edgee_request.body.len() > 0, true);
+        assert!(!edgee_request.body.is_empty());
     }
 
     #[test]
