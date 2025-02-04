@@ -21,10 +21,10 @@ This component enables seamless integration between [Edgee](https://www.edgee.cl
 3. Add the following configuration to your `edgee.toml`:
 
 ```toml
-[[destinations.data_collection]]
-name = "amplitude"
-component = "/var/edgee/components/amplitude.wasm"
-credentials.amplitude_api_key = "..."  # Your Amplitude API Key
+[[components.data_collection]]
+id = "amplitude"
+file = "/var/edgee/components/amplitude.wasm"
+settings.amplitude_api_key = "..."  # Your Amplitude API Key
 ```
 
 ## Event Handling
@@ -49,22 +49,22 @@ User events in Amplitude serve multiple purposes:
 
 ### Basic Configuration
 ```toml
-[[destinations.data_collection]]
-name = "amplitude"
-component = "/var/edgee/components/amplitude.wasm"
-credentials.amplitude_api_key = "..."
+[[components.data_collection]]
+id = "amplitude"
+file = "/var/edgee/components/amplitude.wasm"
+settings.amplitude_api_key = "..."
 
 # Optional configurations
-config.anonymization = true        # Enable/disable data anonymization
-config.default_consent = "pending" # Set default consent status
+settings.edgee_anonymization = true        # Enable/disable data anonymization
+settings.edgee_default_consent = "pending" # Set default consent status
 ```
 
 ### Event Controls
 Control which events are forwarded to Amplitude:
 ```toml
-config.page_event_enabled = true   # Enable/disable page view tracking
-config.track_event_enabled = true  # Enable/disable custom event tracking
-config.user_event_enabled = true   # Enable/disable user identification
+settings.edgee_page_event_enabled = true   # Enable/disable page view tracking
+settings.edgee_track_event_enabled = true  # Enable/disable custom event tracking
+settings.edgee_user_event_enabled = true   # Enable/disable user identification
 ```
 
 ### Consent Management
