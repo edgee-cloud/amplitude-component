@@ -20,12 +20,12 @@ const DEFAULT_ENDPOINT: &str = "https://api2.amplitude.com/2/httpapi";
 struct AmplitudeComponent;
 
 impl Guest for AmplitudeComponent {
-    fn page(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
+    fn page(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
         use serde_json::Value as v;
 
         if let Data::Page(ref data) = edgee_event.data {
             let mut amplitude_payload =
-                AmplitudePayload::new(cred_map).map_err(|e| e.to_string())?;
+                AmplitudePayload::new(settings).map_err(|e| e.to_string())?;
 
             // calculate session_id
             let session_id = edgee_event
@@ -169,14 +169,14 @@ impl Guest for AmplitudeComponent {
         }
     }
 
-    fn track(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
+    fn track(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
         if let Data::Track(ref data) = edgee_event.data {
             if data.name.is_empty() {
                 return Err("Missing event name".to_string());
             }
 
             let mut amplitude_payload =
-                AmplitudePayload::new(cred_map).map_err(|e| e.to_string())?;
+                AmplitudePayload::new(settings).map_err(|e| e.to_string())?;
 
             // calculate session_id
             let session_id = edgee_event
@@ -214,7 +214,7 @@ impl Guest for AmplitudeComponent {
         }
     }
 
-    fn user(edgee_event: Event, cred_map: Dict) -> Result<EdgeeRequest, String> {
+    fn user(edgee_event: Event, settings: Dict) -> Result<EdgeeRequest, String> {
         use serde_json::Value as v;
 
         if let Data::User(ref data) = edgee_event.data {
@@ -223,7 +223,7 @@ impl Guest for AmplitudeComponent {
             }
 
             let mut amplitude_payload =
-                AmplitudePayload::new(cred_map).map_err(|e| e.to_string())?;
+                AmplitudePayload::new(settings).map_err(|e| e.to_string())?;
 
             // calculate session_id
             let session_id = edgee_event
@@ -286,6 +286,7 @@ fn build_edgee_request(amplitude_payload: AmplitudePayload) -> EdgeeRequest {
         method: HttpMethod::Post,
         url: amplitude_payload.endpoint.clone(),
         headers,
+        forward_client_headers: true,
         body: serde_json::to_string(&amplitude_payload).unwrap(),
     }
 }
@@ -476,7 +477,7 @@ mod tests {
         }
     }
 
-    fn sample_credentials() -> Vec<(String, String)> {
+    fn sample_settings() -> Vec<(String, String)> {
         vec![("amplitude_api_key".to_string(), "abc".to_string())]
     }
 
@@ -488,8 +489,7 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials();
-        let result = AmplitudeComponent::page(event, credentials);
+        let result = AmplitudeComponent::page(event, sample_settings());
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -507,8 +507,7 @@ mod tests {
     #[test]
     fn page_without_consent() {
         let event = sample_page_event(None, "abc".to_string(), "fr".to_string(), true);
-        let credentials = sample_credentials();
-        let result = AmplitudeComponent::page(event, credentials);
+        let result = AmplitudeComponent::page(event, sample_settings());
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -519,8 +518,7 @@ mod tests {
     #[test]
     fn page_with_edgee_id_uuid() {
         let event = sample_page_event(None, Uuid::new_v4().to_string(), "fr".to_string(), true);
-        let credentials = sample_credentials();
-        let result = AmplitudeComponent::page(event, credentials);
+        let result = AmplitudeComponent::page(event, sample_settings());
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -532,8 +530,7 @@ mod tests {
     fn page_with_empty_locale() {
         let event = sample_page_event(None, Uuid::new_v4().to_string(), "".to_string(), true);
 
-        let credentials = sample_credentials();
-        let result = AmplitudeComponent::page(event, credentials);
+        let result = AmplitudeComponent::page(event, sample_settings());
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -544,8 +541,7 @@ mod tests {
     #[test]
     fn page_not_session_start() {
         let event = sample_page_event(None, Uuid::new_v4().to_string(), "".to_string(), false);
-        let credentials = sample_credentials();
-        let result = AmplitudeComponent::page(event, credentials);
+        let result = AmplitudeComponent::page(event, sample_settings());
 
         assert_eq!(result.is_err(), false);
         let edgee_request = result.unwrap();
@@ -556,8 +552,8 @@ mod tests {
     #[test]
     fn page_without_measurement_id_fails() {
         let event = sample_page_event(None, "abc".to_string(), "fr".to_string(), true);
-        let credentials: Vec<(String, String)> = vec![]; // empty
-        let result = AmplitudeComponent::page(event, credentials); // this should panic!
+        let settings: Vec<(String, String)> = vec![]; // empty
+        let result = AmplitudeComponent::page(event, settings); // this should panic!
         assert_eq!(result.is_err(), true);
     }
 
@@ -570,8 +566,7 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials();
-        let result = AmplitudeComponent::track(event, credentials);
+        let result = AmplitudeComponent::track(event, sample_settings());
         assert_eq!(result.clone().is_err(), false);
         let edgee_request = result.unwrap();
         assert_eq!(edgee_request.method, HttpMethod::Post);
@@ -587,8 +582,7 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials();
-        let result = AmplitudeComponent::track(event, credentials);
+        let result = AmplitudeComponent::track(event, sample_settings());
         assert_eq!(result.is_err(), true);
     }
 
@@ -600,8 +594,7 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials();
-        let result = AmplitudeComponent::user(event, credentials);
+        let result = AmplitudeComponent::user(event, sample_settings());
 
         assert_eq!(result.clone().is_err(), false);
     }
@@ -614,8 +607,7 @@ mod tests {
             "fr".to_string(),
             true,
         );
-        let credentials = sample_credentials();
-        let result = AmplitudeComponent::user(event, credentials);
+        let result = AmplitudeComponent::user(event, sample_settings());
 
         assert_eq!(result.clone().is_err(), true);
         assert_eq!(
@@ -640,8 +632,7 @@ mod tests {
         );
         event.context.user.properties = vec![]; // empty context user properties
         event.context.user.user_id = "".to_string(); // empty context user id
-        let credentials = sample_credentials();
-        let result = AmplitudeComponent::track(event, credentials);
+        let result = AmplitudeComponent::track(event, sample_settings());
         //println!("Error: {}", result.clone().err().unwrap().to_string().as_str());
         assert_eq!(result.clone().is_err(), false);
     }
