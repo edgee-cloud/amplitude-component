@@ -14,8 +14,8 @@ pub(crate) struct AmplitudePayload {
 }
 
 impl AmplitudePayload {
-    pub(crate) fn new(cred_map: Dict) -> anyhow::Result<Self> {
-        let cred: HashMap<String, String> = cred_map
+    pub(crate) fn new(settings: Dict) -> anyhow::Result<Self> {
+        let cred: HashMap<String, String> = settings
             .iter()
             .map(|(key, value)| (key.to_string(), value.to_string()))
             .collect();
