@@ -1,0 +1,26 @@
+manifest-version = 1
+
+[component]
+name = "Amplitude"
+version = "0.7.0"
+category = "data-collection"
+subcategory = "analytics"
+description = """
+Get fast answers to any growth question without coding. Amplitude unites all your data with behavioral analytics and AI automation—for an easier way to build your best product.
+#### Clear insights you can't miss
+Access reliable product insights in seconds with automated reports. Understand your user journey at a glance with instant visualizations. Amplitude gives all teams access to accurate, real-time insights while highlighting what’s actionable, so you can make smart decisions with confidence.
+![Amplitude](https://embed-ssl.wistia.com/deliveries/a7e6bc40ba09a2cc5e86dc0148c12b74.jpg)"""
+documentation = "https://www.edgee.cloud/docs/components/data-collection/amplitude"
+repository = "https://github.com/edgee-cloud/amplitude-component"
+wit-world-version = "0.4.0"
+
+[component.build]
+command = "cargo build --target wasm32-wasip2 --release && cp ./target/wasm32-wasip2/release/amplitude_component.wasm amplitude.wasm"
+output_path = "amplitude.wasm"
+
+[component.settings.amplitude_api_key]
+title = "API Key"
+type = "string"
+required = true
+description = """
+The API key for your Amplitude project"""
