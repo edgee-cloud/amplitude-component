@@ -3,12 +3,12 @@ mod amplitude_payload;
 use crate::amplitude_payload::parse_value;
 use amplitude_payload::AmplitudeEvent;
 use amplitude_payload::AmplitudePayload;
-use exports::edgee::protocols::data_collection::Data;
-use exports::edgee::protocols::data_collection::Dict;
-use exports::edgee::protocols::data_collection::EdgeeRequest;
-use exports::edgee::protocols::data_collection::Event;
-use exports::edgee::protocols::data_collection::Guest;
-use exports::edgee::protocols::data_collection::HttpMethod;
+use exports::edgee::components::data_collection::Data;
+use exports::edgee::components::data_collection::Dict;
+use exports::edgee::components::data_collection::EdgeeRequest;
+use exports::edgee::components::data_collection::Event;
+use exports::edgee::components::data_collection::Guest;
+use exports::edgee::components::data_collection::HttpMethod;
 use std::vec;
 
 wit_bindgen::generate!({world: "data-collection", path: "wit", generate_all});
@@ -294,10 +294,10 @@ fn build_edgee_request(amplitude_payload: AmplitudePayload) -> EdgeeRequest {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::exports::edgee::protocols::data_collection::{
+    use crate::exports::edgee::components::data_collection::{
         Campaign, Client, Context, EventType, PageData, Session, TrackData, UserData,
     };
-    use exports::edgee::protocols::data_collection::Consent;
+    use exports::edgee::components::data_collection::Consent;
     use pretty_assertions::assert_eq;
     use uuid::Uuid;
 
