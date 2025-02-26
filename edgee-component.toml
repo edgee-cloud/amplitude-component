@@ -12,7 +12,7 @@ Access reliable product insights in seconds with automated reports. Understand y
 ![Amplitude](https://embed-ssl.wistia.com/deliveries/a7e6bc40ba09a2cc5e86dc0148c12b74.jpg)"""
 documentation = "https://www.edgee.cloud/docs/components/data-collection/amplitude"
 repository = "https://github.com/edgee-cloud/amplitude-component"
-wit-world-version = "0.4.0"
+wit-world-version = "0.5.0"
 
 [component.build]
 command = "cargo build --target wasm32-wasip2 --release && cp ./target/wasm32-wasip2/release/amplitude_component.wasm amplitude.wasm"
