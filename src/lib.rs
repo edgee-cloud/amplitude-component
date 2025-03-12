@@ -11,7 +11,7 @@ use exports::edgee::components::data_collection::Guest;
 use exports::edgee::components::data_collection::HttpMethod;
 use std::vec;
 
-wit_bindgen::generate!({world: "data-collection", path: "wit", generate_all});
+wit_bindgen::generate!({world: "data-collection", path: ".edgee/wit", generate_all});
 
 export!(AmplitudeComponent);
 
