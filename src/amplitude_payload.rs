@@ -27,7 +27,7 @@ impl AmplitudePayload {
         .to_string();
 
         let endpoint = cred
-            .get("endpoint")
+            .get("amplitude_endpoint")
             .cloned()
             .unwrap_or(crate::DEFAULT_ENDPOINT.to_owned());
 

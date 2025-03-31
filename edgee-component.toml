@@ -24,5 +24,11 @@ output_path = "amplitude.wasm"
 title = "API Key"
 type = "string"
 required = true
+description = "The API key for your Amplitude project"
+
+[component.settings.amplitude_endpoint]
+title = "Endpoint (optional)"
+type = "string"
 description = """
-The API key for your Amplitude project"""
+The Endpoint for your Amplitude project. The default value is https://api2.amplitude.com/2/httpapi
+"""
