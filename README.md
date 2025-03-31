@@ -59,6 +59,7 @@ file = "/var/edgee/components/amplitude.wasm"
 settings.amplitude_api_key = "..."
 
 # Optional configurations
+settings.amplitude_endpoint = "..."        # The default value is https://api2.amplitude.com/2/httpapi
 settings.edgee_anonymization = true        # Enable/disable data anonymization
 settings.edgee_default_consent = "pending" # Set default consent status
 ```
