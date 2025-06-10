@@ -2,7 +2,7 @@ manifest-version = 1
 
 [component]
 name = "Amplitude"
-version = "1.1.0"
+version = "1.1.1"
 category = "data-collection"
 subcategory = "analytics"
 description = """
