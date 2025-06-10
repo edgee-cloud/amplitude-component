@@ -636,4 +636,73 @@ mod tests {
         //println!("Error: {}", result.clone().err().unwrap().to_string().as_str());
         assert_eq!(result.clone().is_err(), false);
     }
+
+    #[test]
+    fn uses_default_endpoint_when_no_amplitude_endpoint_setting() {
+        let event = sample_page_event(
+            Some(Consent::Granted),
+            "abc".to_string(),
+            "fr".to_string(),
+            true,
+        );
+        // Only provide API key, no endpoint
+        let settings = vec![("amplitude_api_key".to_string(), "abc".to_string())];
+        let result = AmplitudeComponent::page(event, settings);
+        assert_eq!(result.is_err(), false);
+        let edgee_request = result.unwrap();
+        assert!(
+            edgee_request.url.starts_with(DEFAULT_ENDPOINT),
+            "Expected default endpoint, got: {}",
+            edgee_request.url
+        );
+    }
+
+    #[test]
+    fn uses_default_endpoint_when_amplitude_endpoint_is_empty_string() {
+        let event = sample_page_event(
+            Some(Consent::Granted),
+            "abc".to_string(),
+            "fr".to_string(),
+            true,
+        );
+        // Provide API key and empty endpoint
+        let settings = vec![
+            ("amplitude_api_key".to_string(), "abc".to_string()),
+            ("amplitude_endpoint".to_string(), "".to_string()),
+        ];
+        let result = AmplitudeComponent::page(event, settings);
+        assert_eq!(result.is_err(), false);
+        let edgee_request = result.unwrap();
+        assert!(
+            edgee_request.url.starts_with(DEFAULT_ENDPOINT),
+            "Expected default endpoint, got: {}",
+            edgee_request.url
+        );
+    }
+
+    #[test]
+    fn uses_custom_endpoint_when_amplitude_endpoint_is_provided() {
+        let custom_endpoint = "https://custom.amplitude.com/api";
+        let event = sample_page_event(
+            Some(Consent::Granted),
+            "abc".to_string(),
+            "fr".to_string(),
+            true,
+        );
+        let settings = vec![
+            ("amplitude_api_key".to_string(), "abc".to_string()),
+            (
+                "amplitude_endpoint".to_string(),
+                custom_endpoint.to_string(),
+            ),
+        ];
+        let result = AmplitudeComponent::page(event, settings);
+        assert_eq!(result.is_err(), false);
+        let edgee_request = result.unwrap();
+        assert!(
+            edgee_request.url.starts_with(custom_endpoint),
+            "Expected custom endpoint, got: {}",
+            edgee_request.url
+        );
+    }
 }
