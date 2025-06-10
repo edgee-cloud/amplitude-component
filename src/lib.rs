@@ -691,7 +691,10 @@ mod tests {
         );
         let settings = vec![
             ("amplitude_api_key".to_string(), "abc".to_string()),
-            ("amplitude_endpoint".to_string(), custom_endpoint.to_string()),
+            (
+                "amplitude_endpoint".to_string(),
+                custom_endpoint.to_string(),
+            ),
         ];
         let result = AmplitudeComponent::page(event, settings);
         assert_eq!(result.is_err(), false);
@@ -702,5 +705,4 @@ mod tests {
             edgee_request.url
         );
     }
-
 }
