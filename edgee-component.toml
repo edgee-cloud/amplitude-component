@@ -25,6 +25,7 @@ title = "API Key"
 type = "string"
 required = true
 description = "The API key for your Amplitude project"
+secret = true
 
 [component.settings.amplitude_endpoint]
 title = "Endpoint (optional)"
