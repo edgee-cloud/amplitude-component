@@ -17,7 +17,7 @@ icon-path = "amplitude.png"
 language = "Rust"
 
 [component.build]
-command = "cargo build --target wasm32-wasip2 --release && cp ./target/wasm32-wasip2/release/amplitude_component.wasm amplitude.wasm"
+command = "cargo build --target wasm32-wasip2 --release && rm -f amplitude.wasm && cp ./target/wasm32-wasip2/release/amplitude_component.wasm amplitude.wasm"
 output_path = "amplitude.wasm"
 
 [component.settings.amplitude_api_key]
